@@ -1,0 +1,39 @@
+service: severless-monorepo
+
+useDotenv: true
+
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  sstApp: ${self:custom.stage}-serverless-monorepo-infrastructure
+  bundle:
+    tsConfig: ./lambda-tsconfig/tsconfig.json
+    linting: false # Lint will be handle it by Nx
+    externals: all
+    # These dependencies most be include it in case to use MySql and/or GraphQL
+    # forceInclude:
+    #   - mysql
+    #   - apollo-server-express
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  apiGateway:
+    shouldStartNameWithService: true
+
+functions:
+  todos:
+    handler: ./apps/be-todos/src/lambda.handler
+    events:
+      - http:
+          path: /
+          method: get
+          cors: true

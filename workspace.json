@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "projects": {
+    "be-todos": {
+      "root": "apps/be-todos",
+      "sourceRoot": "apps/be-todos/src",
+      "projectType": "application",
+      "prefix": "be-todos",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/apps/be-todos",
+            "main": "apps/be-todos/src/main.ts",
+            "tsConfig": "apps/be-todos/tsconfig.app.json",
+            "assets": [
+              "apps/be-todos/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/be-todos/src/environments/environment.ts",
+                  "with": "apps/be-todos/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "be-todos:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/be-todos/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/be-todos"
+          ],
+          "options": {
+            "jestConfig": "apps/be-todos/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/nest"
+  },
+  "defaultProject": "be-todos"
+}
