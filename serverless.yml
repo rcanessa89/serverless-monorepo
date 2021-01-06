@@ -10,24 +10,43 @@ plugins:
   - serverless-offline
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  sstApp: ${self:custom.stage}-serverless-monorepo-infrastructure
+  sstApp: ${self:provider.stage}-serverless-monorepo-infrastructure
   bundle:
     tsConfig: ./lambda-tsconfig/tsconfig.json
     linting: false # Lint will be handle it by Nx
     externals: all
     # These dependencies most be include it in case to use MySql and/or GraphQL
-    # forceInclude:
-    #   - mysql
+    forceInclude:
+      - mysql
     #   - apollo-server-express
 
 provider:
   name: aws
   runtime: nodejs12.x
-  stage: dev
-  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
   apiGateway:
     shouldStartNameWithService: true
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:*
+    - Effect: Allow
+      Action:
+        - ec2:CreateNetworkInterface
+      Resource: arn:aws:ec2:${self:provider.region}:*:*
+
+environment:
+  STAGE: ${self:provider.stage}
+  REGION: ${self:provider.region}
+  SERVICE: ${self:service}
 
 functions:
   todos:
@@ -35,5 +54,13 @@ functions:
     events:
       - http:
           path: /
+          method: get
+          cors: true
+      - http:
+          path: graphql
+          method: post
+          cors: true
+      - http:
+          path: graphql
           method: get
           cors: true

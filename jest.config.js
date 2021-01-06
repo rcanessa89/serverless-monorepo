@@ -1,3 +1,10 @@
 module.exports = {
-  projects: ['<rootDir>/apps/be-todos'],
+  projects: [
+    '<rootDir>/apps/be-todos',
+    '<rootDir>/libs/utils',
+    '<rootDir>/libs/types',
+    '<rootDir>/libs/be-api-base',
+    '<rootDir>/libs/be-todos',
+    '<rootDir>/libs/be-todos-lib',
+  ],
 };

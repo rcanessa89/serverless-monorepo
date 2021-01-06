@@ -12,6 +12,28 @@
       "apiGateway": {
         "shouldStartNameWithService": true
       },
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:DescribeTable",
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem"
+          ],
+          "Resource": "arn:aws:dynamodb:us-east-1:*:*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ec2:CreateNetworkInterface"
+          ],
+          "Resource": "arn:aws:ec2:us-east-1:*:*"
+        }
+      ],
       "variableSyntax": "\\${([^{}:]+?(?:\\(|:)(?:[^:{}][^{}]*?)?)}",
       "versionFunctions": true,
       "compiledCloudFormationTemplate": {
@@ -149,6 +171,12 @@
                             "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/severless-monorepo-dev*:*:*"
                           }
                         ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][1]"
                       }
                     ]
                   }
@@ -177,7 +205,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/severless-monorepo/dev/1609596532513-2021-01-02T14:08:52.513Z/todos.zip"
+                "S3Key": "serverless/severless-monorepo/dev/1609969428500-2021-01-06T21:43:48.500Z/todos.zip"
               },
               "Handler": "./apps/be-todos/src/lambda.handler",
               "Runtime": "nodejs12.x",
@@ -195,14 +223,14 @@
               "TodosLogGroup"
             ]
           },
-          "TodosLambdaVersionXhdl39tOlRBqRsZ1DQXNFEQNpnainONezZ3UhHbQ": {
+          "TodosLambdaVersionloYZtGonui69tA46671KmkofbIy9Zk9ys77qSEk": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "TodosLambdaFunction"
               },
-              "CodeSha256": "3vDmRToL4tH+jmEh04Y6iFh8QLWkz8oE6/j/xONSBcQ="
+              "CodeSha256": "NtjOcMyzLpAKb+ev8UKun5jfaox9WSbyLEojRj13suI="
             }
           },
           "ApiGatewayRestApi": {
@@ -215,6 +243,21 @@
                 ]
               },
               "Policy": ""
+            }
+          },
+          "ApiGatewayResourceGraphql": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "graphql",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
             }
           },
           "ApiGatewayMethodOptions": {
@@ -259,6 +302,51 @@
                   "ApiGatewayRestApi",
                   "RootResourceId"
                 ]
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodGraphqlOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,POST'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".+\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceGraphql"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -311,7 +399,93 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1609596496431": {
+          "ApiGatewayMethodGraphqlPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceGraphql"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "TodosLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodGraphqlGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceGraphql"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "TodosLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1609969360952": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -321,7 +495,10 @@
             },
             "DependsOn": [
               "ApiGatewayMethodOptions",
-              "ApiGatewayMethodGet"
+              "ApiGatewayMethodGraphqlOptions",
+              "ApiGatewayMethodGet",
+              "ApiGatewayMethodGraphqlPost",
+              "ApiGatewayMethodGraphqlGet"
             ]
           },
           "TodosLambdaPermissionApiGateway": {
@@ -371,7 +548,7 @@
           "TodosLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "TodosLambdaVersionXhdl39tOlRBqRsZ1DQXNFEQNpnainONezZ3UhHbQ"
+              "Ref": "TodosLambdaVersionloYZtGonui69tA46671KmkofbIy9Zk9ys77qSEk"
             }
           },
           "ServiceEndpoint": {
@@ -484,12 +661,14 @@
       "vpc": {}
     },
     "custom": {
-      "stage": "dev",
       "sstApp": "dev-serverless-monorepo-infrastructure",
       "bundle": {
         "tsConfig": "./lambda-tsconfig/tsconfig.json",
         "linting": false,
-        "externals": "all"
+        "externals": "all",
+        "forceInclude": [
+          "mysql"
+        ]
       },
       "webpack": {
         "packager": "npm",
@@ -499,7 +678,9 @@
           "forceExclude": [
             "aws-sdk"
           ],
-          "forceInclude": null,
+          "forceInclude": {
+            "$ref": "$[\"service\"][\"custom\"][\"bundle\"][\"forceInclude\"]"
+          },
           "packagePath": "package.json"
         }
       }
@@ -538,6 +719,58 @@
               },
               "integration": "AWS_PROXY"
             }
+          },
+          {
+            "http": {
+              "path": "graphql",
+              "method": "post",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "POST"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "graphql",
+              "method": "get",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
           }
         ],
         "name": "severless-monorepo-dev-todos",
@@ -548,7 +781,7 @@
         "timeout": 6,
         "runtime": "nodejs12.x",
         "vpc": {},
-        "versionLogicalId": "TodosLambdaVersionXhdl39tOlRBqRsZ1DQXNFEQNpnainONezZ3UhHbQ"
+        "versionLogicalId": "TodosLambdaVersionloYZtGonui69tA46671KmkofbIy9Zk9ys77qSEk"
       }
     },
     "configValidationMode": "warn",
@@ -561,7 +794,7 @@
       "useDotenv": true,
       "package": {
         "individually": true,
-        "artifactDirectoryName": "serverless/severless-monorepo/dev/1609596532513-2021-01-02T14:08:52.513Z"
+        "artifactDirectoryName": "serverless/severless-monorepo/dev/1609969428500-2021-01-06T21:43:48.500Z"
       },
       "plugins": {
         "$ref": "$[\"service\"][\"plugins\"]"
@@ -572,6 +805,11 @@
       "provider": {
         "$ref": "$[\"service\"][\"provider\"]"
       },
+      "environment": {
+        "STAGE": "dev",
+        "REGION": "us-east-1",
+        "SERVICE": "severless-monorepo"
+      },
       "functions": {
         "$ref": "$[\"service\"][\"functions\"]"
       }
@@ -580,7 +818,7 @@
   },
   "package": {
     "individually": true,
-    "artifactDirectoryName": "serverless/severless-monorepo/dev/1609596532513-2021-01-02T14:08:52.513Z",
+    "artifactDirectoryName": "serverless/severless-monorepo/dev/1609969428500-2021-01-06T21:43:48.500Z",
     "artifact": ""
   }
 }

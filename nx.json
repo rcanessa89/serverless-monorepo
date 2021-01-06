@@ -23,7 +23,19 @@
     }
   },
   "projects": {
+    "utils": {
+      "tags": []
+    },
+    "types": {
+      "tags": []
+    },
+    "be-api-base": {
+      "tags": []
+    },
     "be-todos": {
+      "tags": []
+    },
+    "be-todos-lib": {
       "tags": []
     }
   }

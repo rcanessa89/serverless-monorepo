@@ -1,6 +1,81 @@
 {
   "version": 2,
   "projects": {
+    "utils": {
+      "root": "libs/utils",
+      "sourceRoot": "libs/utils/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/utils"
+          ],
+          "options": {
+            "jestConfig": "libs/utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "types": {
+      "root": "libs/types",
+      "sourceRoot": "libs/types/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/types/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/types"
+          ],
+          "options": {
+            "jestConfig": "libs/types/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "be-api-base": {
+      "root": "libs/be-api-base",
+      "sourceRoot": "libs/be-api-base/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/be-api-base/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/be-api-base"
+          ],
+          "options": {
+            "jestConfig": "libs/be-api-base/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
     "be-todos": {
       "root": "apps/be-todos",
       "sourceRoot": "apps/be-todos/src",
@@ -55,6 +130,31 @@
           ],
           "options": {
             "jestConfig": "apps/be-todos/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "be-todos-lib": {
+      "root": "libs/be-todos-lib",
+      "sourceRoot": "libs/be-todos-lib/src",
+      "projectType": "library",
+      "targets": {
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/be-todos-lib/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/be-todos-lib"
+          ],
+          "options": {
+            "jestConfig": "libs/be-todos-lib/jest.config.js",
             "passWithNoTests": true
           }
         }
