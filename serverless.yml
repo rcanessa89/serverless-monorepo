@@ -18,7 +18,6 @@ custom:
     # These dependencies most be include it in case to use MySql and/or GraphQL
     forceInclude:
       - mysql
-    #   - apollo-server-express
 
 provider:
   name: aws
