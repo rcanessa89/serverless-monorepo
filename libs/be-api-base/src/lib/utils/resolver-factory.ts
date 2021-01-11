@@ -37,24 +37,22 @@ export function resolverFactory<T, CI, UI extends { id: number }>({
     }
 
     @Query(() => [Entity], { name: findAllName })
-    findAll(@Args(TransformBodyPipe) { options }: FindAllArgs,) {
-      console.log(options)
-
+    findAll(@Args(TransformBodyPipe) { options }: FindAllArgs,): T[] {
       return this.service.findAll(options);
     }
 
     @Query(() => Entity, { name: findOneName })
-    findOne(@Args() { id, options }: FindOneArgs) {
+    findOne(@Args() { id, options }: FindOneArgs): T {
       return this.service.findOne(id, options);
     }
 
     @Query(() => Int, { name: countName })
-    count() {
+    count(): number {
       return this.service.count();
     }
 
     @Mutation(() => Entity, { name: createName })
-    create(@Args(lowerFirstLetter(CreateInput.name), { type: () => CreateInput }, TransformBodyPipe) createInput: CI) {
+    create(@Args(lowerFirstLetter(CreateInput.name), { type: () => CreateInput }, TransformBodyPipe) createInput: CI): T {
       return this.service.create(createInput);
     }
 
