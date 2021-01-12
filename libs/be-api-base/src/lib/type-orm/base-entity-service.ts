@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Repository, DeleteResult, FindManyOptions, FindOneOptions, SaveOptions } from 'typeorm';
+import { Repository, DeleteResult, FindManyOptions, FindOneOptions } from 'typeorm';
 
 import { ResolverFactoryOptions } from '../types/interfaces';
 
-export abstract class BaseTypeORMEntityService<T, CI, UI> {
+export abstract class BaseEntityService<T, CI, UI = Partial<CI> & { id: number }> {
   protected readonly repository: Repository<T>;
   private readonly options: ResolverFactoryOptions<T>;
 

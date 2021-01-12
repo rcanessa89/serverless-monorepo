@@ -9,7 +9,6 @@ import { AppService } from './app.service';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot(baseGraphQlConfig()),
     TypeOrmModule.forRoot(baseTypeOrmConfig({
       type: 'mysql',
       host: 'localhost',

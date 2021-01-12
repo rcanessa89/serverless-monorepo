@@ -1,5 +1,15 @@
 import { PipeTransform, Injectable } from '@nestjs/common';
-import { Resolver, Query, Mutation, Args, ID, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  ID,
+  Int,
+  PartialType,
+  InputType,
+  Field
+} from '@nestjs/graphql';
 
 import { pluralize } from '@serverless-monorepo/utils';
 import { ResolverFactoryArgs } from '../types/interfaces';
@@ -12,11 +22,21 @@ class TransformBodyPipe implements PipeTransform {
   }
 }
 
-export function resolverFactory<T, CI, UI extends { id: number }>({
+const UpdateInputFactory = (Input): any => {
+  @InputType()
+  class UpdateInput extends PartialType(Input) {
+    @Field(() => ID)
+    id: number;
+  }
+
+  return UpdateInput;
+}
+
+export const resolverFactory = <T, CI, UI extends { id: number }>({
   Entity,
   CreateInput,
   UpdateInput
-}: ResolverFactoryArgs<T, CI, UI>): any {
+}: ResolverFactoryArgs<T, CI, UI>): any => {
   const lowerFirstLetter = (s): string => {
     return s[0].toLowerCase() + s.slice(1);
   };
@@ -27,6 +47,8 @@ export function resolverFactory<T, CI, UI extends { id: number }>({
   const countName = `count${entityName}`;
   const updateName = `update${entityName}`;
   const removeName = `remove${entityName}`;
+
+  UpdateInput = UpdateInput || UpdateInputFactory(CreateInput)
 
   @Resolver(() => Entity)
   class BaseResolver {

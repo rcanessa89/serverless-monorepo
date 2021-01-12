@@ -8,7 +8,7 @@ import {
   Query
 } from '@nestjs/common';
 
-export const controllerFactory = <T>(Entity: { new(): T }): any => {
+export const controllerFactory = (): any => {
   abstract class BaseController {
     protected readonly service;
 

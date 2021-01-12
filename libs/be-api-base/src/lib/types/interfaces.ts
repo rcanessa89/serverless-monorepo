@@ -9,5 +9,12 @@ export interface ResolverFactoryOptions<T> {
 export interface ResolverFactoryArgs<T, CI, UI> {
   Entity: { new (): T };
   CreateInput: { new (): CI };
-  UpdateInput: { new (): UI };
+  UpdateInput?: { new (): UI };
+}
+
+export interface ControllerSwaggerFactoryArgs<T, C, U> {
+  Entity: { new (): T };
+  CreateVM?: { new (): T };
+  UpdateVM?: { new (): T };
+  ApiException?: { new (): any };
 }

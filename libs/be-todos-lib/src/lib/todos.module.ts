@@ -14,7 +14,6 @@ import { TodosController } from './todos.controller';
     ])
   ],
   providers: [
-    TodosResolver,
     TodosService
   ],
   controllers: [TodosController]

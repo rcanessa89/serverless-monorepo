@@ -1,12 +1,11 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 
-import { BaseTypeORMEntity } from '@serverless-monorepo/be-api-base';
+import { BaseSwaggerEntity } from '@serverless-monorepo/be-api-base';
 import { Column, Entity } from 'typeorm';
 
-@ObjectType()
 @Entity()
-export class Todo extends BaseTypeORMEntity {
-  @Field()
+export class Todo extends BaseSwaggerEntity {
+  @ApiProperty()
   @Column()
   text: string;
 }

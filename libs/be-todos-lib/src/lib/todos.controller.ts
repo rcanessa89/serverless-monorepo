@@ -1,10 +1,12 @@
-import { Controller } from "@nestjs/common";
+import { Controller } from '@nestjs/common';
 
-import { controllerFactory } from '@serverless-monorepo/be-api-base';
-import { TodosService } from "./todos.service";
+import { controllerSwaggerFactory } from '@serverless-monorepo/be-api-base';
+import { TodosService } from './todos.service';
 import { Todo } from './entities/todo.entity';
 
-const BaseController = controllerFactory(Todo)
+const BaseController = controllerSwaggerFactory({
+  Entity: Todo
+});
 
 @Controller('todos')
 export class TodosController extends BaseController {

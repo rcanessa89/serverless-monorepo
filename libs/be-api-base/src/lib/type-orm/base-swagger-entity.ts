@@ -4,21 +4,18 @@ import {
   CreateDateColumn,
   UpdateDateColumn
 } from 'typeorm';
-import { Field, ObjectType, ID } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
 
-@ObjectType({
-  isAbstract: true
-})
-export abstract class BaseTypeORMEntity extends TypeORMBaseEntity {
-  @Field(() => ID)
+export abstract class BaseSwaggerEntity extends TypeORMBaseEntity {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Field()
+  @ApiProperty({ type: String, format: 'date-time' })
   @CreateDateColumn()
   createdAt?: string;
 
-  @Field()
+  @ApiProperty({ type: String, format: 'date-time' })
   @UpdateDateColumn()
   updatedAt?: string;
 }
