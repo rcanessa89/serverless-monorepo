@@ -11,10 +11,20 @@ plugins:
 
 custom:
   sstApp: ${self:provider.stage}-serverless-monorepo-infrastructure
+  dbSecret: !ImportValue '${self:custom.sstApp}-dbSecret'
   bundle:
     tsConfig: ./lambda-tsconfig/tsconfig.json
     linting: false # Lint will be handle it by Nx
-    externals: all
+    externals:
+      - '@nestjs/microservices'
+      - 'apollo-server-fastify'
+      - 'cache-manager'
+      - 'class-transformer'
+      - 'class-validator'
+      - '@nestjs/microservices/microservices-module'
+      - '@nestjs/websockets/socket-module'
+      - 'class-transformer/storage'
+      - 'fastify-swagger'
     # These dependencies most be include it in case to use MySql and/or GraphQL
     forceInclude:
       - mysql
@@ -24,42 +34,29 @@ provider:
   runtime: nodejs12.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
+  environment:
+    STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    SERVICE: ${self:service}
+    Db_SECRET: '${self:custom.dbSecret}'
+  vpc:
+    securityGroupIds:
+      - !ImportValue '${self:custom.sstApp}-securityGroupId'
+    subnetIds:
+      - !ImportValue '${self:custom.sstApp}-subnetId'
   apiGateway:
     shouldStartNameWithService: true
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: arn:aws:dynamodb:${self:provider.region}:*:*
-    - Effect: Allow
-      Action:
         - ec2:CreateNetworkInterface
-      Resource: arn:aws:ec2:${self:provider.region}:*:*
-
-environment:
-  STAGE: ${self:provider.stage}
-  REGION: ${self:provider.region}
-  SERVICE: ${self:service}
+      Resource: '*'
 
 functions:
   todos:
     handler: ./apps/be-todos/src/lambda.handler
     events:
       - http:
-          path: /
-          method: get
-          cors: true
-      - http:
-          path: graphql
-          method: post
-          cors: true
-      - http:
-          path: graphql
-          method: get
+          path: /{proxy+}
+          method: any
           cors: true

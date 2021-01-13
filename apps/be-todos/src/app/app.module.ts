@@ -7,15 +7,14 @@ import { baseGraphQlConfig, baseTypeOrmConfig } from '@serverless-monorepo/be-ap
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+console.log('config!', baseTypeOrmConfig({
+  database: 'ServerlessMonorepo'
+}))
+
 @Module({
   imports: [
     TypeOrmModule.forRoot(baseTypeOrmConfig({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'Admin123',
-      database: 'serverless-monorepo'
+      database: 'ServerlessMonorepo'
     })),
     TodosModule
   ],

@@ -3,7 +3,7 @@ import { Repository, DeleteResult, FindManyOptions, FindOneOptions } from 'typeo
 
 import { ResolverFactoryOptions } from '../types/interfaces';
 
-export abstract class BaseEntityService<T, CI, UI = Partial<CI> & { id: number }> {
+export abstract class BaseEntityService<T, CI, UI = Partial<CI>> {
   protected readonly repository: Repository<T>;
   private readonly options: ResolverFactoryOptions<T>;
 
@@ -38,11 +38,19 @@ export abstract class BaseEntityService<T, CI, UI = Partial<CI> & { id: number }
   }
 
   public create(item: CI): Promise<T> {
+    console.log('create/item =>', item)
+
     return this.repository.save(item, this.options.create);
   }
 
-  public async update(id: string | number, item: UI): Promise<T> {
-    await this.repository.update(id, item);
+  public async update(item: UI): Promise<T> {
+    const id: number | string = (<any>item).id;
+
+    try {
+      await this.repository.update(id, item);
+    } catch (e) {
+      return e;
+    }
 
     return this.findOne(id);
   }

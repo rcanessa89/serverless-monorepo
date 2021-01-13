@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-import { isProd } from '@serverless-monorepo/utils';
+import { envValues, isProd } from '@serverless-monorepo/utils';
 
 const isProdStage = isProd();
 
@@ -16,7 +16,20 @@ const BASE_CONFIG = Object.freeze({
   synchronize: !isProdStage
 });
 
-export const baseTypeOrmConfig = (c: Partial<TypeOrmModuleOptions> = {}): TypeOrmModuleOptions & any => ({
-  ...BASE_CONFIG,
-  ...c
-});
+export const baseTypeOrmConfig = (c: Partial<TypeOrmModuleOptions> = {}): TypeOrmModuleOptions => {
+  let config;
+
+  try {
+    config = JSON.parse(envValues.dbSecret);
+    config.type = config.engine;
+    config.database = envValues.dbName;
+  } catch {
+    config = BASE_CONFIG;
+  }
+
+  return {
+    ...BASE_CONFIG,
+    ...config,
+    ...c
+  }
+};

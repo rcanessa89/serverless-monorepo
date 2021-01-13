@@ -134,22 +134,18 @@ export const controllerSwaggerFactory = <T, C, U>({
       return this.service.findOne(id, optionsObj);
     }
 
-    @Put(':id')
+    @Put()
     @ApiBody({
       type: UpdateVM,
       isArray: false,
-    })
-    @ApiParam({
-      name: 'id',
-      description: 'Entity ID'
     })
     @ApiCreatedResponse({ type: Entity })
     @ConditionalDecorator(
       !!ApiException,
       ApiBadRequestResponse({ type: ApiException })
     )
-    update(@Param('id') id: string | number, @Body() updateUserDto) {
-      return this.service.update(id, updateUserDto);
+    update(@Body() updateUserDto) {
+      return this.service.update(updateUserDto);
     }
 
     @Delete(':id')
